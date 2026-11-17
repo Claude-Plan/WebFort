@@ -109,12 +109,43 @@ export function generateDeterministicRule(finding, hardenedOptions = null) {
   return rule;
 }
 
+export function generatePositiveSecurityRule(finding) {
+  const param = finding.param || 'q';
+  const location = finding.param_location || 'query';
+  const pathValue = finding.route_template || finding.url.split('?')[0];
+
+  return {
+    schema_version: '1.0',
+    name: `positive_allowlist_${finding.category}_patch_${param}`,
+    scope: {
+      methods: [finding.method || 'GET'],
+      path: { kind: 'prefix', value: pathValue }
+    },
+    inspect: [{ location, name: param }],
+    normalize: ['url_decode_recursive', 'unicode_nfkc', 'collapse_whitespace'],
+    condition: {
+      op: 'regex_not_match',
+      value: '^[a-zA-Z0-9_\\-\\.\\s]{1,60}$'
+    },
+    action: 'block',
+    mode: 'shadow'
+  };
+}
+
 export async function generatePatchForFinding(finding, strategy = 'auto') {
   if (strategy === 'canonical') {
     return {
       source: 'canonical',
       rule: generateCanonicalNaiveRule(finding),
       rationale: 'Seeded with a minimal naive advisory rule to test evasion resilience.'
+    };
+  }
+
+  if (strategy === 'positive_security') {
+    return {
+      source: 'deterministic',
+      rule: generatePositiveSecurityRule(finding),
+      rationale: 'Generated positive-security allowlist (regex_not_match) capping charset to alphanumeric and length to 60.'
     };
   }
 
