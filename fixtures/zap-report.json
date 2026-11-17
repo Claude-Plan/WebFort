@@ -1,0 +1,119 @@
+{
+  "@programName": "OWASP ZAP",
+  "@version": "2.14.0",
+  "generated": "Tue, 17 Nov 2026 06:30:00",
+  "site": [
+    {
+      "@name": "http://localhost:3001",
+      "@host": "localhost",
+      "@port": "3001",
+      "@ssl": "false",
+      "alerts": [
+        {
+          "pluginId": "10020",
+          "alertRef": "10020-1",
+          "alert": "Missing Anti-clickjacking Header",
+          "name": "Missing Anti-clickjacking Header",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "desc": "The response does not include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options to protect against 'ClickJacking' attacks.",
+          "instances": [
+            { "uri": "http://localhost:3001/", "method": "GET", "param": "x-frame-options" }
+          ]
+        },
+        {
+          "pluginId": "10038",
+          "alertRef": "10038-1",
+          "alert": "Content Security Policy (CSP) Header Not Set",
+          "name": "Content Security Policy (CSP) Header Not Set",
+          "riskcode": "2",
+          "confidence": "3",
+          "riskdesc": "Medium (High)",
+          "desc": "Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks.",
+          "instances": [
+            { "uri": "http://localhost:3001/", "method": "GET", "param": "content-security-policy" }
+          ]
+        },
+        {
+          "pluginId": "10035",
+          "alertRef": "10035-1",
+          "alert": "Strict-Transport-Security Header Not Set",
+          "name": "Strict-Transport-Security Header Not Set",
+          "riskcode": "1",
+          "confidence": "3",
+          "riskdesc": "Low (High)",
+          "desc": "HTTP Strict Transport Security (HSTS) is an optional response header that can be configured on the server to instruct the browser to only communicate over HTTPS.",
+          "instances": [
+            { "uri": "http://localhost:3001/", "method": "GET", "param": "strict-transport-security" }
+          ]
+        },
+        {
+          "pluginId": "10021",
+          "alertRef": "10021-1",
+          "alert": "X-Content-Type-Options Header Missing",
+          "name": "X-Content-Type-Options Header Missing",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "desc": "The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'.",
+          "instances": [
+            { "uri": "http://localhost:3001/", "method": "GET", "param": "x-content-type-options" }
+          ]
+        },
+        {
+          "pluginId": "10045",
+          "alertRef": "10045-1",
+          "alert": "Directory Browsing / Path Traversal Alert",
+          "name": "Directory Browsing / Path Traversal Alert",
+          "riskcode": "2",
+          "confidence": "2",
+          "riskdesc": "Medium (Medium)",
+          "desc": "Directory browsing is enabled and it is possible to view files in the directory.",
+          "instances": [
+            { "uri": "http://localhost:3001/ftp", "method": "GET", "param": "path" }
+          ]
+        },
+        {
+          "pluginId": "40012",
+          "alertRef": "40012-1",
+          "alert": "Cross Site Scripting (Reflected)",
+          "name": "Cross Site Scripting (Reflected)",
+          "riskcode": "3",
+          "confidence": "2",
+          "riskdesc": "High (Medium)",
+          "desc": "Cross-site Scripting (XSS) is an attack technique that involves echoing attacker-supplied code into a user's browser instance.",
+          "instances": [
+            { "uri": "http://localhost:3001/#/search?q=%3Cscript%3E", "method": "GET", "param": "q" }
+          ]
+        },
+        {
+          "pluginId": "10011",
+          "alertRef": "10011-1",
+          "alert": "Cookie Without Secure Flag",
+          "name": "Cookie Without Secure Flag",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "desc": "A cookie has been set without the secure flag, which means that the cookie can be accessed via unencrypted connections.",
+          "instances": [
+            { "uri": "http://localhost:3001/", "method": "GET", "param": "cookie" }
+          ]
+        },
+        {
+          "pluginId": "10036",
+          "alertRef": "10036-1",
+          "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+          "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+          "riskcode": "0",
+          "confidence": "3",
+          "riskdesc": "Informational (High)",
+          "desc": "The web/application server is leaking version information via the 'Server' HTTP response header.",
+          "instances": [
+            { "uri": "http://localhost:3001/", "method": "GET", "param": "server" }
+          ]
+        }
+      ]
+    }
+  ]
+}

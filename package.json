@@ -1,0 +1,19 @@
+{
+  "name": "patchproof-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "target:lab": "node scripts/lab-target.js",
+    "seed:corpus": "node scripts/corpus-benign.js",
+    "build": "npm --workspace=apps/web run build"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  }
+}
