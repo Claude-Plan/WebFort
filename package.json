@@ -8,6 +8,10 @@
     "apps/*"
   ],
   "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "node scripts/test-vertical-slice.js",
+    "test:all": "vitest run && node scripts/test-vertical-slice.js",
     "dev": "node scripts/dev.js",
     "target:lab": "node scripts/lab-target.js",
     "seed:corpus": "node scripts/corpus-benign.js",

@@ -8,14 +8,15 @@ const OLLAMA_MODEL_FALLBACK = process.env.OLLAMA_MODEL_FALLBACK || 'llama3.2:3b'
 const LLM_TIMEOUT_MS = parseInt(process.env.LLM_TIMEOUT_MS || '5000', 10);
 
 export async function checkOllamaHealth() {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 2000);
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 2000);
     const resp = await fetch(`${OLLAMA_BASE_URL}/api/version`, { signal: controller.signal });
-    clearTimeout(timer);
     return resp.ok;
   } catch {
     return false;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -51,10 +52,10 @@ Evidence: ${sanitizeUntrustedData(finding.evidence || '')}
 
 INSTRUCTION: Output a concise 2-sentence technical rationale for why this finding received priority band ${priorityBand} (Score: ${priorityScore}/100). Do not include markdown codeblocks.`;
 
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), Math.min(LLM_TIMEOUT_MS, 6000));
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), Math.min(LLM_TIMEOUT_MS, 6000));
 
+  try {
     const resp = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -65,7 +66,6 @@ INSTRUCTION: Output a concise 2-sentence technical rationale for why this findin
       }),
       signal: controller.signal
     });
-    clearTimeout(timeout);
 
     if (resp.ok) {
       const data = await resp.json();
@@ -77,6 +77,8 @@ INSTRUCTION: Output a concise 2-sentence technical rationale for why this findin
     }
   } catch (err) {
     // Fallback on timeout or connection error
+  } finally {
+    clearTimeout(timeout);
   }
 
   return {

@@ -226,6 +226,13 @@ export default function FindingsQueue({ findings, onDraftPatch, selectedFinding,
                     >
                       Canonical (v1 Naive)
                     </button>
+                    <button
+                      onClick={() => setStrategy('positive_security')}
+                      className={`px-2 py-1 rounded text-xs font-mono ${strategy === 'positive_security' ? 'bg-cyan-500 text-black font-bold' : 'bg-[#1f2638] text-slate-300'}`}
+                      title="Positive security allowlist (regex_not_match)"
+                    >
+                      Positive Allowlist
+                    </button>
                   </div>
                 </div>
 

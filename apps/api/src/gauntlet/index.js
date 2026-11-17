@@ -133,8 +133,9 @@ export const MUTATORS = [
     mutate: (req) => {
       const copy = JSON.parse(JSON.stringify(req));
       // Full-width single quote \uFF07 (＇)
-      const repl = (s) => s.replace(/'/g, '\uFF07');
+      const repl = (s) => s.replace(/('|%27)/gi, '\uFF07');
       if (copy.url.includes('?')) copy.url = repl(copy.url);
+      if (copy.body && typeof copy.body === 'string') copy.body = repl(copy.body);
       return [copy];
     }
   },
