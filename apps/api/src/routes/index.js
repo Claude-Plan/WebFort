@@ -689,7 +689,7 @@ router.get('/stream', (req, res) => {
 
 // 16. Internal routes for Proxy (X-Internal-Token authentication)
 router.get('/internal/v1/rules/active', async (req, res) => {
-  const token = req.headers['x-internal-token'];
+  const token = req.headers['x-internal-token'] || req.headers['x-shield-internal-token'];
   if (token !== INTERNAL_TOKEN) return res.status(401).json({ error: 'Unauthorized' });
 
   const deployed = await query("select * from patches where status = 'deployed'");
@@ -705,7 +705,7 @@ router.get('/internal/v1/rules/active', async (req, res) => {
 });
 
 router.get('/internal/v1/rules/candidate/:patch_id', async (req, res) => {
-  const token = req.headers['x-internal-token'];
+  const token = req.headers['x-internal-token'] || req.headers['x-shield-internal-token'];
   if (token !== INTERNAL_TOKEN) return res.status(401).json({ error: 'Unauthorized' });
 
   const p = await query('select * from patches where id = $1', [req.params.patch_id]);
@@ -715,7 +715,7 @@ router.get('/internal/v1/rules/candidate/:patch_id', async (req, res) => {
 });
 
 router.post('/internal/v1/events', async (req, res) => {
-  const token = req.headers['x-internal-token'];
+  const token = req.headers['x-internal-token'] || req.headers['x-shield-internal-token'];
   if (token !== INTERNAL_TOKEN) return res.status(401).json({ error: 'Unauthorized' });
 
   const events = req.body?.events || [];
