@@ -1,7 +1,8 @@
 # WebFort 🛡️
 
 > **AI-Driven Adaptive Web Application Firewall (WAF) & Vulnerability Triage**  
-> *Continuous Firewall Rule Verification, Mutation Gauntlet & Tamper-Evident Proof Reports (Plan A — "PatchProof")*
+> *Continuous Firewall Rule Verification, Mutation Gauntlet & Tamper-Evident Proof Reports (Plan A — "PatchProof")*  
+> Detailed specification: [`docs/PLAN_A_PROBLEM_PLAN.md`](docs/PLAN_A_PROBLEM_PLAN.md)
 
 ---
 
