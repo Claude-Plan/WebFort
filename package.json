@@ -2,6 +2,7 @@
   "name": "patchproof",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "PatchProof - AI-Driven Adaptive WAF & Vulnerability Triage",
   "workspaces": [
     "packages/*",
@@ -11,7 +12,8 @@
     "dev:api": "node apps/api/src/index.js",
     "dev:proxy": "node apps/proxy/src/index.js",
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:proxy\"",
-    "test": "node --test packages/waf-engine/test/engine.test.js apps/proxy/test/proxy.test.js apps/api/test/api.test.js apps/api/test/p3.test.js apps/api/test/vertical-slice.test.js"
+    "test": "node --test packages/waf-engine/test/engine.test.js apps/proxy/test/proxy.test.js apps/api/test/api.test.js apps/api/test/p3.test.js apps/api/test/vertical-slice.test.js",
+    "demo": "node scripts/demo.js"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
