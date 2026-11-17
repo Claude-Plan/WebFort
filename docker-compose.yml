@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: patchproof-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: patchproof
+      POSTGRES_PASSWORD: patchproof
+      POSTGRES_DB: patchproof
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./apps/api/src/db/001_core.sql:/docker-entrypoint-initdb.d/001_core.sql
+
+  juiceshop:
+    image: bkimminich/juice-shop:v17.1.1
+    container_name: patchproof-juiceshop
+    restart: always
+    ports:
+      - "3001:3000"
+
+volumes:
+  postgres_data:
