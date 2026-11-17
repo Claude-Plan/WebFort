@@ -7,6 +7,13 @@ export function generateCanonicalNaiveRule(finding) {
   const location = finding.param_location || 'query';
   const pathValue = finding.route_template || finding.url.split('?')[0];
 
+  let naiveValue = "union select|' or 1=1--";
+  if (finding.category === 'path_traversal') {
+    naiveValue = "../etc/passwd";
+  } else if (finding.category === 'xss') {
+    naiveValue = "<script>alert(1)</script>";
+  }
+
   return {
     schema_version: '1.0',
     name: `naive_${finding.category}_patch_${param}`,
@@ -19,7 +26,7 @@ export function generateCanonicalNaiveRule(finding) {
     normalize: ['lowercase'],
     condition: {
       op: 'regex_match',
-      value: "union select|' or 1=1--"
+      value: naiveValue
     },
     action: 'block',
     mode: 'shadow'
@@ -49,10 +56,15 @@ export function generateDeterministicRule(finding, hardenedOptions = null) {
       value: '(?:union\\s+(?:all\\s+)?select|\\b(?:or|and)\\s+[\\w\'"\\(]+\\s*=\\s*[\\w\'"\\)]+|--|#|/\\*)'
     };
   } else if (category === 'path_traversal') {
-    normalize = ['url_decode_recursive', 'lowercase'];
+    normalize = [
+      'url_decode_recursive',
+      'lowercase',
+      'remove_null_bytes',
+      'collapse_whitespace'
+    ];
     condition = {
-      op: 'contains_any',
-      value: ['../', '..\\', '\u0000']
+      op: 'regex_match',
+      value: '(?:\\.\\.[\\/\\\\]|etc\\/(?:passwd|hosts|shadow)|win\\.ini)'
     };
   } else if (category === 'xss') {
     normalize = [

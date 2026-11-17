@@ -135,6 +135,33 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // R3: Path Traversal / Arbitrary File Read endpoint
+  if (pathname === '/rest/file/download' && req.method === 'GET') {
+    const file = parsedUrl.searchParams.get('file') || '';
+    let fileDecoded = file;
+    try { fileDecoded = decodeURIComponent(fileDecoded); } catch {}
+    try { fileDecoded = decodeURIComponent(fileDecoded); } catch {} // double decode
+
+    const hasTraversal = fileDecoded.includes('../') || fileDecoded.includes('..\\') || fileDecoded.includes('etc/passwd') || fileDecoded.includes('win.ini');
+
+    if (hasTraversal) {
+      // Simulate /etc/passwd or secret file disclosure
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end(`root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\njuice-admin:x:1000:1000:JuiceAdmin,,,:/home/juice-admin:/bin/bash\nJUICE_SECRET_FLAG=flag{patchproof_lfi_exploit_confirmed_2026}\n`);
+      return;
+    }
+
+    if (file === 'sample.pdf' || file === 'legal.md' || file === 'terms.txt') {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end(`Sample legitimate file content for ${file}`);
+      return;
+    }
+
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'File not found.' }));
+    return;
+  }
+
   // Other standard Juice Shop endpoints (for benign corpus)
   if (pathname === '/rest/admin/application-version') {
     res.writeHead(200, { 'Content-Type': 'application/json' });

