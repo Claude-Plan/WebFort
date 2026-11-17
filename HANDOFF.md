@@ -140,28 +140,35 @@ MOCK_MODE=0
 
 ## 6. How to Run the Project
 
-### Step 1: Start Docker Services (Postgres & Juice Shop)
+### Quickest Start (Both API :4000 and Proxy :8080 Together)
+```powershell
+npm.cmd run dev
+```
+*Zero npm install required! Starts both the Control Plane API (:4000) and the Reverse Proxy (:8080) simultaneously with graceful shutdown.*
+
+### Running Services Individually
+
+#### Step 1: Start Docker Services (Postgres & Juice Shop, Optional)
 ```powershell
 cd WebFort
 docker compose up -d
 ```
 *Note: If Docker is not available, the system will use its embedded in-memory data layer and built-in target simulations.*
 
-### Step 2: Start Control Plane API (Port 4000)
+#### Step 2: Start Control Plane API (Port 4000)
 ```powershell
-node WebFort/apps/api/src/index.js
+node apps/api/src/index.js
 ```
 *The Security Console is immediately viewable by opening `http://localhost:4000/` in a web browser.*
 
-### Step 3: Start WAF Reverse Proxy (Port 8080)
+#### Step 3: Start WAF Reverse Proxy (Port 8080)
 ```powershell
-node WebFort/apps/proxy/src/index.js
+node apps/proxy/src/index.js
 ```
 
-### Step 4: Run Vite Frontend Dev Server (Port 5173, Optional)
+#### Step 4: Run Automated CLI Demo (All 9 Pitch Steps in Terminal)
 ```powershell
-cd WebFort/apps/web
-npm.cmd run dev
+npm.cmd run demo
 ```
 
 ---
