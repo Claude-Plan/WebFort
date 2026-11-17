@@ -25,7 +25,8 @@ const memoryStore = {
   proxy_events: [],
   hardening_runs: [],
   proof_reports: [],
-  benchmark_runs: []
+  benchmark_runs: [],
+  attack_lab_runs: []
 };
 
 function memoryQuery(text, params = []) {
@@ -127,43 +128,61 @@ function memoryQuery(text, params = []) {
     }
   }
 
-  // 3. UPDATE table SET ... WHERE id = ...
+  // 3. UPDATE table SET ... WHERE ...
   if (lowerSql.startsWith('update')) {
     const tableMatch = lowerSql.match(/update\s+([a-z_]+)/i);
     const tableName = tableMatch ? tableMatch[1].toLowerCase() : null;
 
     if (tableName && memoryStore[tableName]) {
-      const whereMatch = cleanSql.match(/where\s+([a-z_]+)\s*=\s*\$(\d+)/i);
-      if (whereMatch) {
-        const col = whereMatch[1].toLowerCase();
-        const paramIdx = parseInt(whereMatch[2], 10) - 1;
-        const targetVal = String(params[paramIdx]);
+      const setMatch = cleanSql.match(/set\s+(.+?)\s+where\s+(.+)$/i);
+      if (setMatch) {
+        const setClause = setMatch[1];
+        const whereClause = setMatch[2];
 
-        const rowIndex = memoryStore[tableName].findIndex(r => String(r[col]) === targetVal);
-        if (rowIndex !== -1) {
-          const row = memoryStore[tableName][rowIndex];
+        // Parse assignments
+        const assignments = setClause.split(',').map(a => {
+          const [col, valRef] = a.trim().split('=').map(s => s.trim());
+          return { col: col.toLowerCase(), valRef };
+        });
 
-          // Parse SET assignments
-          const setMatch = cleanSql.match(/set\s+(.+)\s+where/i);
-          if (setMatch) {
-            const assignments = setMatch[1].split(',');
-            for (const assign of assignments) {
-              const [c, pRef] = assign.trim().split('=').map(s => s.trim());
-              const pIdxMatch = pRef.match(/\$(\d+)/);
-              if (pIdxMatch) {
-                const idx = parseInt(pIdxMatch[1], 10) - 1;
-                let val = params[idx];
-                if (typeof val === 'string' && (val.startsWith('{') || val.startsWith('['))) {
-                  try { val = JSON.parse(val); } catch {}
-                }
-                row[c.toLowerCase()] = val;
-              } else if (pRef.toLowerCase() === 'now()') {
-                row[c.toLowerCase()] = new Date().toISOString();
+        // Filter target rows
+        const matchingRows = memoryStore[tableName].filter(row => {
+          // Check where col = $N
+          const paramWhere = whereClause.match(/([a-z_]+)\s*=\s*\$(\d+)/i);
+          if (paramWhere) {
+            const col = paramWhere[1].toLowerCase();
+            const pIdx = parseInt(paramWhere[2], 10) - 1;
+            return String(row[col]) === String(params[pIdx]);
+          }
+          // Check where col = 'literal'
+          const literalWhere = whereClause.match(/([a-z_]+)\s*=\s*'([^']+)'/i);
+          if (literalWhere) {
+            const col = literalWhere[1].toLowerCase();
+            const litVal = literalWhere[2];
+            return String(row[col]) === litVal;
+          }
+          return true;
+        });
+
+        // Apply SET assignments to all matching rows
+        for (const row of matchingRows) {
+          for (const { col, valRef } of assignments) {
+            const pIdxMatch = valRef.match(/\$(\d+)/);
+            if (pIdxMatch) {
+              const idx = parseInt(pIdxMatch[1], 10) - 1;
+              let val = params[idx];
+              if (typeof val === 'string' && (val.startsWith('{') || val.startsWith('['))) {
+                try { val = JSON.parse(val); } catch {}
               }
+              row[col] = val;
+            } else if (/^'([^']*)'$/.test(valRef)) {
+              row[col] = valRef.slice(1, -1);
+            } else if (valRef.toLowerCase() === 'now()') {
+              row[col] = new Date().toISOString();
             }
           }
-          return { rows: [row] };
         }
+        return { rows: matchingRows };
       }
     }
   }

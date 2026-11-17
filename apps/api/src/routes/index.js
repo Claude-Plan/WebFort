@@ -11,8 +11,10 @@ import { runMutationGauntlet } from '../gauntlet/index.js';
 import { runHardeningLoop } from '../harden/index.js';
 import { signReport, verifyProofSignature, DEMO_PUBLIC_KEY } from '../proof/index.js';
 import { runBenchmark } from '../benchmark/index.js';
+import attackLabRouter from './attack-lab.js';
 
 export const router = Router();
+router.use(attackLabRouter);
 
 const TARGET_URL = process.env.TARGET_URL || 'http://localhost:3001';
 const PROXY_URL = process.env.PROXY_URL || 'http://localhost:8080';
@@ -433,6 +435,9 @@ router.post('/patches/:id/deploy', async (req, res) => {
   const patch = p.rows[0];
   const updatedRule = { ...patch.rule, mode };
 
+  // Demote previous deployed rules so only current rule is active
+  await query("update patches set status = 'superseded' where status = 'deployed'");
+
   await query(
     'update patches set mode = $1, status = $2, rule = $3, deployed_at = now() where id = $4',
     [mode, 'deployed', JSON.stringify(updatedRule), patch.id]
@@ -445,7 +450,7 @@ router.post('/patches/:id/rollback', async (req, res) => {
   const p = await query('select * from patches where id = $1', [req.params.id]);
   if (p.rows.length === 0) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Patch not found' } });
 
-  await query('update patches set status = $1 where id = $2', ['rolled_back', req.params.id]);
+  await query("update patches set status = 'rolled_back' where status = 'deployed'");
   res.json({ data: { id: req.params.id, status: 'rolled_back' } });
 });
 

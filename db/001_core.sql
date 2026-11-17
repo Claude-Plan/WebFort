@@ -99,6 +99,16 @@ create table if not exists benchmark_runs(
   status text not null default 'queued' check (status in ('queued','running','completed','failed')),
   created_at timestamptz not null default now());
 
+create table if not exists attack_lab_runs(
+  id uuid primary key default gen_random_uuid(),
+  recipe_id text not null,
+  run_type text not null check (run_type in ('direct','proxy','benign')),
+  request_data jsonb not null,
+  response_data jsonb not null,
+  verdict text not null,
+  latency_ms numeric(8,2) not null,
+  created_at timestamptz not null default now());
+
 create index if not exists idx_findings_target_status on findings(target_id,status);
 create index if not exists idx_proxy_events_target_ts on proxy_events(target_id,ts desc);
 create index if not exists idx_verification_cases_verif_suite on verification_cases(verification_id,suite);

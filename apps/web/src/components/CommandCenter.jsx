@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Activity, Shield, AlertTriangle, Database, Bot, Zap, CheckCircle2, XCircle, ArrowUpRight } from 'lucide-react';
+import { Activity, Shield, AlertTriangle, Database, Bot, Zap, CheckCircle2, XCircle, ArrowUpRight, Flame, BarChart2 } from 'lucide-react';
+import AttackLab from './AttackLab';
 
 export default function CommandCenter({ health, stats, onRunRecipe, onImportZap, onSelectFinding, findings }) {
+  const [activeView, setActiveView] = useState('attack-lab');
   const [loadingRecipe, setLoadingRecipe] = useState(null);
   const [importingZap, setImportingZap] = useState(false);
 
@@ -118,126 +120,169 @@ export default function CommandCenter({ health, stats, onRunRecipe, onImportZap,
         </div>
       </div>
 
-      {/* Exploit Injection & Scan Ingestion Strip */}
-      <div className="p-5 rounded-lg bg-[#11151f] border border-[#1f2638] space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-amber-400" />
-            <h3 className="text-sm font-semibold tracking-wide text-white uppercase font-mono">
-              Laboratory Exploit Trigger & Scanner Ingestion
-            </h3>
-          </div>
-          <span className="text-xs font-mono text-slate-400">Live Verification on localhost:3001</span>
-        </div>
+      {/* Primary Sub-View Toggle (Attack Lab vs Scanner Telemetry) */}
+      <div className="flex items-center gap-2 border-b border-[#1f2638] pb-1">
+        <button
+          onClick={() => setActiveView('attack-lab')}
+          className={`px-4 py-2 rounded-t-md font-mono text-xs font-bold transition flex items-center gap-2 border-b-2 ${
+            activeView === 'attack-lab'
+              ? 'text-emerald-400 border-emerald-400 bg-[#11151f]'
+              : 'text-slate-400 border-transparent hover:text-white'
+          }`}
+        >
+          <Zap className="w-4 h-4 text-amber-400" />
+          <span>ATTACK LAB & 12-STEP GUIDED DEMO</span>
+          <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">PRIMARY</span>
+        </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <button
-            onClick={() => handleRecipeClick('R1')}
-            disabled={loadingRecipe !== null}
-            className="flex flex-col items-start p-3 rounded-md bg-[#090b10] border border-red-500/30 hover:border-red-500 hover:bg-red-500/5 transition text-left group"
-          >
-            <div className="flex items-center justify-between w-full">
-              <span className="text-xs font-bold text-red-400 font-mono">RECIPE R1</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-mono">SQLi Search</span>
-            </div>
-            <span className="text-sm font-medium text-white mt-1">Product Search UNION Leak</span>
-            <span className="text-xs text-slate-400 mt-1 line-clamp-1 font-mono">
-              GET /rest/products/search?q=UNION SELECT...
-            </span>
-            <div className="mt-2 text-xs text-red-400 flex items-center gap-1 group-hover:underline">
-              {loadingRecipe === 'R1' ? 'Executing attack...' : 'Fire Exploit & Confirm Hole →'}
-            </div>
-          </button>
-
-          <button
-            onClick={() => handleRecipeClick('R2')}
-            disabled={loadingRecipe !== null}
-            className="flex flex-col items-start p-3 rounded-md bg-[#090b10] border border-red-500/30 hover:border-red-500 hover:bg-red-500/5 transition text-left group"
-          >
-            <div className="flex items-center justify-between w-full">
-              <span className="text-xs font-bold text-red-400 font-mono">RECIPE R2</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-mono">SQLi Auth Bypass</span>
-            </div>
-            <span className="text-sm font-medium text-white mt-1">Login Tautology Bypass</span>
-            <span className="text-xs text-slate-400 mt-1 line-clamp-1 font-mono">
-              POST /rest/user/login &#123;email: "' or 1=1--"&#125;
-            </span>
-            <div className="mt-2 text-xs text-red-400 flex items-center gap-1 group-hover:underline">
-              {loadingRecipe === 'R2' ? 'Executing attack...' : 'Fire Exploit & Confirm Hole →'}
-            </div>
-          </button>
-
-          <button
-            onClick={handleZapClick}
-            disabled={importingZap}
-            className="flex flex-col items-start p-3 rounded-md bg-[#090b10] border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/5 transition text-left group"
-          >
-            <div className="flex items-center justify-between w-full">
-              <span className="text-xs font-bold text-blue-400 font-mono">SCANNER IMPORT</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono">OWASP ZAP</span>
-            </div>
-            <span className="text-sm font-medium text-white mt-1">Load ZAP Baseline Scan</span>
-            <span className="text-xs text-slate-400 mt-1 line-clamp-1 font-mono">
-              Import 14 standard alerts to demonstrate triage ranking
-            </span>
-            <div className="mt-2 text-xs text-blue-400 flex items-center gap-1 group-hover:underline">
-              {importingZap ? 'Importing scan...' : 'Ingest Scanner Report →'}
-            </div>
-          </button>
-        </div>
+        <button
+          onClick={() => setActiveView('telemetry')}
+          className={`px-4 py-2 rounded-t-md font-mono text-xs font-bold transition flex items-center gap-2 border-b-2 ${
+            activeView === 'telemetry'
+              ? 'text-emerald-400 border-emerald-400 bg-[#11151f]'
+              : 'text-slate-400 border-transparent hover:text-white'
+          }`}
+        >
+          <BarChart2 className="w-4 h-4 text-cyan-400" />
+          <span>SCANNER INGESTION & FINDINGS TELEMETRY</span>
+        </button>
       </div>
 
-      {/* Recent Findings Preview */}
-      <div className="p-5 rounded-lg bg-[#11151f] border border-[#1f2638] space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold tracking-wide text-white uppercase font-mono">
-            High Priority Vulnerabilities Ready for Virtual Patching
-          </h3>
-          <span className="text-xs text-slate-400 font-mono">Sorted by deterministic triage score</span>
-        </div>
+      {/* VIEW 1: ATTACK LAB */}
+      {activeView === 'attack-lab' && (
+        <AttackLab
+          health={health}
+          onNavigateToPatch={() => {}}
+          onNavigateToProof={() => {}}
+          onNavigateToQueue={() => {}}
+        />
+      )}
 
-        <div className="divide-y divide-[#1f2638]">
-          {findings.slice(0, 4).map(f => (
-            <div key={f.id} className="py-3 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${
-                  f.triage?.priority_band === 'P0' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                  f.triage?.priority_band === 'P1' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                  'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                }`}>
-                  {f.triage?.priority_band || 'P1'} ({f.triage?.priority_score || 50})
-                </span>
-                <div>
-                  <div className="text-sm font-medium text-white flex items-center gap-2">
-                    {f.title}
-                    {f.exploit_confirmed && (
-                      <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono border border-emerald-500/30">
-                        EXPLOIT CONFIRMED
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-slate-400 font-mono">
-                    {f.method} {f.route_template || f.url} · Param: <span className="text-slate-300">{f.param || 'N/A'}</span>
-                  </div>
-                </div>
+      {/* VIEW 2: SCANNER INGESTION & FINDINGS TELEMETRY */}
+      {activeView === 'telemetry' && (
+        <div className="space-y-6">
+          {/* Exploit Injection & Scan Ingestion Strip */}
+          <div className="p-5 rounded-lg bg-[#11151f] border border-[#1f2638] space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-amber-400" />
+                <h3 className="text-sm font-semibold tracking-wide text-white uppercase font-mono">
+                  Laboratory Exploit Trigger & Scanner Ingestion
+                </h3>
               </div>
+              <span className="text-xs font-mono text-slate-400">Live Verification on localhost:3001</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <button
+                onClick={() => handleRecipeClick('R1')}
+                disabled={loadingRecipe !== null}
+                className="flex flex-col items-start p-3 rounded-md bg-[#090b10] border border-red-500/30 hover:border-red-500 hover:bg-red-500/5 transition text-left group"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xs font-bold text-red-400 font-mono">RECIPE R1</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-mono">SQLi Search</span>
+                </div>
+                <span className="text-sm font-medium text-white mt-1">Product Search UNION Leak</span>
+                <span className="text-xs text-slate-400 mt-1 line-clamp-1 font-mono">
+                  GET /rest/products/search?q=UNION SELECT...
+                </span>
+                <div className="mt-2 text-xs text-red-400 flex items-center gap-1 group-hover:underline">
+                  {loadingRecipe === 'R1' ? 'Executing attack...' : 'Fire Exploit & Confirm Hole →'}
+                </div>
+              </button>
 
               <button
-                onClick={() => onSelectFinding(f)}
-                className="px-3 py-1.5 rounded bg-[#1f2638] hover:bg-emerald-600 hover:text-black transition text-xs font-mono text-slate-200 flex items-center gap-1"
+                onClick={() => handleRecipeClick('R2')}
+                disabled={loadingRecipe !== null}
+                className="flex flex-col items-start p-3 rounded-md bg-[#090b10] border border-red-500/30 hover:border-red-500 hover:bg-red-500/5 transition text-left group"
               >
-                Inspect & Patch <ArrowUpRight className="w-3.5 h-3.5" />
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xs font-bold text-red-400 font-mono">RECIPE R2</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-mono">SQLi Auth Bypass</span>
+                </div>
+                <span className="text-sm font-medium text-white mt-1">Login Tautology Bypass</span>
+                <span className="text-xs text-slate-400 mt-1 line-clamp-1 font-mono">
+                  POST /rest/user/login &#123;email: "' or 1=1--"&#125;
+                </span>
+                <div className="mt-2 text-xs text-red-400 flex items-center gap-1 group-hover:underline">
+                  {loadingRecipe === 'R2' ? 'Executing attack...' : 'Fire Exploit & Confirm Hole →'}
+                </div>
+              </button>
+
+              <button
+                onClick={handleZapClick}
+                disabled={importingZap}
+                className="flex flex-col items-start p-3 rounded-md bg-[#090b10] border border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/5 transition text-left group"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xs font-bold text-blue-400 font-mono">SCANNER IMPORT</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono">OWASP ZAP</span>
+                </div>
+                <span className="text-sm font-medium text-white mt-1">Load ZAP Baseline Scan</span>
+                <span className="text-xs text-slate-400 mt-1 line-clamp-1 font-mono">
+                  Import 14 standard alerts to demonstrate triage ranking
+                </span>
+                <div className="mt-2 text-xs text-blue-400 flex items-center gap-1 group-hover:underline">
+                  {importingZap ? 'Importing scan...' : 'Ingest Scanner Report →'}
+                </div>
               </button>
             </div>
-          ))}
+          </div>
 
-          {findings.length === 0 && (
-            <div className="py-8 text-center text-xs text-slate-400 font-mono">
-              No findings ingested yet. Click "RECIPE R1" or "LOAD ZAP BASELINE SCAN" above to begin.
+          {/* Recent Findings Preview */}
+          <div className="p-5 rounded-lg bg-[#11151f] border border-[#1f2638] space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold tracking-wide text-white uppercase font-mono">
+                High Priority Vulnerabilities Ready for Virtual Patching
+              </h3>
+              <span className="text-xs text-slate-400 font-mono">Sorted by deterministic triage score</span>
             </div>
-          )}
+
+            <div className="divide-y divide-[#1f2638]">
+              {findings.slice(0, 4).map(f => (
+                <div key={f.id} className="py-3 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${
+                      f.triage?.priority_band === 'P0' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                      f.triage?.priority_band === 'P1' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                      'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                    }`}>
+                      {f.triage?.priority_band || 'P1'} ({f.triage?.priority_score || 50})
+                    </span>
+                    <div>
+                      <div className="text-sm font-medium text-white flex items-center gap-2">
+                        {f.title}
+                        {f.exploit_confirmed && (
+                          <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono border border-emerald-500/30">
+                            EXPLOIT CONFIRMED
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-slate-400 font-mono">
+                        {f.method} {f.route_template || f.url} · Param: <span className="text-slate-300">{f.param || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => onSelectFinding(f)}
+                    className="px-3 py-1.5 rounded bg-[#1f2638] hover:bg-emerald-600 hover:text-black transition text-xs font-mono text-slate-200 flex items-center gap-1"
+                  >
+                    Inspect & Patch <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+
+              {findings.length === 0 && (
+                <div className="py-8 text-center text-xs text-slate-400 font-mono">
+                  No findings ingested yet. Click "RECIPE R1" or "LOAD ZAP BASELINE SCAN" above to begin.
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -363,6 +363,83 @@ export default function PatchStudio({
                   </div>
                 </div>
 
+                {/* Visual Rule Diff Viewer (Section 5 Requirement) */}
+                {hardenResult.iterations?.length > 1 && (
+                  <div className="p-3.5 rounded bg-[#090b10] border border-[#1f2638] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-mono font-bold text-cyan-400 uppercase flex items-center gap-1.5">
+                        <Terminal className="w-4 h-4 text-cyan-400" />
+                        VISUAL RULE EVOLUTION & DIFF (INITIAL VS HARDENED)
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">
+                        v{hardenResult.iterations[0].version} ({ (hardenResult.iterations[0].stats.bypass_rate * 100).toFixed(1) }% bypass) → v{hardenResult.best_patch?.version || hardenResult.iterations[hardenResult.iterations.length - 1].version} (0.0% bypass)
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
+                      {/* Initial Naive Version */}
+                      <div className="p-3 rounded bg-[#11151f] border border-red-500/20 space-y-2">
+                        <div className="text-[11px] font-bold text-red-400 flex items-center justify-between pb-1 border-b border-[#1f2638]">
+                          <span>v{hardenResult.iterations[0].version} Naive Advisory Rule</span>
+                          <span className="text-[10px] text-red-400 font-bold">HIGH BYPASS</span>
+                        </div>
+                        <div>Scope: <span className="text-slate-300">{hardenResult.iterations[0].rule.scope?.methods?.join(', ')} {hardenResult.iterations[0].rule.scope?.path?.value}</span></div>
+                        <div>
+                          <span className="text-slate-400 text-[11px]">Normalizers ({hardenResult.iterations[0].rule.normalize?.length || 0}):</span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {hardenResult.iterations[0].rule.normalize?.map(n => (
+                              <span key={n} className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-300 text-[10px] border border-red-500/20">
+                                {n}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="mt-2">
+                          <span className="text-slate-400 text-[11px]">Condition Regex:</span>
+                          <pre className="p-1.5 rounded bg-[#090b10] text-red-300 text-[10px] overflow-x-auto whitespace-pre-wrap mt-1">
+                            {hardenResult.iterations[0].rule.condition?.value}
+                          </pre>
+                        </div>
+                      </div>
+
+                      {/* Hardened Version */}
+                      <div className="p-3 rounded bg-[#11151f] border border-emerald-500/30 space-y-2">
+                        <div className="text-[11px] font-bold text-emerald-400 flex items-center justify-between pb-1 border-b border-[#1f2638]">
+                          <span>v{hardenResult.best_patch?.version || hardenResult.iterations[hardenResult.iterations.length - 1].version} Auto-Tightened Rule</span>
+                          <span className="text-[10px] text-emerald-300 font-bold">0.0% BYPASS</span>
+                        </div>
+                        <div>Scope: <span className="text-slate-300">{hardenResult.best_patch?.rule?.scope?.methods?.join(', ') || hardenResult.iterations[hardenResult.iterations.length - 1].rule.scope?.methods?.join(', ')} {hardenResult.best_patch?.rule?.scope?.path?.value || hardenResult.iterations[hardenResult.iterations.length - 1].rule.scope?.path?.value}</span></div>
+                        <div>
+                          <span className="text-slate-400 text-[11px]">Added Normalizers (Self-Synthesized):</span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {(hardenResult.best_patch?.rule?.normalize || hardenResult.iterations[hardenResult.iterations.length - 1].rule.normalize)?.map(n => {
+                              const isNew = !hardenResult.iterations[0].rule.normalize?.includes(n);
+                              return (
+                                <span
+                                  key={n}
+                                  className={`px-1.5 py-0.5 rounded text-[10px] border ${
+                                    isNew
+                                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-bold'
+                                      : 'bg-slate-800 text-slate-300 border-slate-700'
+                                  }`}
+                                >
+                                  {isNew ? `+ ${n}` : n}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        <div className="mt-2">
+                          <span className="text-slate-400 text-[11px]">Hardened Condition:</span>
+                          <pre className="p-1.5 rounded bg-[#090b10] text-emerald-300 text-[10px] overflow-x-auto whitespace-pre-wrap mt-1">
+                            {hardenResult.best_patch?.rule?.condition?.value || hardenResult.iterations[hardenResult.iterations.length - 1].rule.condition?.value}
+                          </pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Fresh Exam Score (Unseen Seed) */}
                 <div className="p-3.5 rounded bg-gradient-to-r from-emerald-950/40 to-[#090b10] border border-emerald-500/30 flex items-center justify-between">
                   <div>
