@@ -22,6 +22,15 @@ if (isDirectExecution) {
   runMigrations().then(() => {
     apiServer.listen(port, () => {
       console.log(`[PatchProof API] Control Plane running on http://localhost:${port}`);
+      console.log(`[PatchProof Console] Security Dashboard available at http://localhost:${port}/`);
     });
+  });
+
+  process.on('SIGINT', () => {
+    apiServer.close(() => process.exit(0));
+  });
+
+  process.on('SIGTERM', () => {
+    apiServer.close(() => process.exit(0));
   });
 }
