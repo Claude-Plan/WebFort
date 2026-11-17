@@ -32,7 +32,7 @@ export default function CommandCenter({ health, stats, onRunRecipe, onImportZap,
             <span className="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
               <Shield className="w-6 h-6" />
             </span>
-            PATCHPROOF COMMAND CENTER
+            WEBFORT COMMAND CENTER
           </h1>
           <p className="text-xs text-slate-400 mt-1 font-mono">
             AI-Driven Adaptive WAF & Vulnerability Triage System · Real-Time Control Plane

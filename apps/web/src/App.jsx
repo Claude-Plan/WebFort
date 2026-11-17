@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, LayoutDashboard, Layers, Cpu, Award, BarChart3, AlertTriangle, Activity } from 'lucide-react';
+import { Shield, LayoutDashboard, Layers, Cpu, Award, BarChart3, AlertTriangle, Activity, ArrowLeft } from 'lucide-react';
+import LandingPage from './components/LandingPage';
 import CommandCenter from './components/CommandCenter';
 import FindingsQueue from './components/FindingsQueue';
 import PatchStudio from './components/PatchStudio';
@@ -7,7 +8,7 @@ import ProofPage from './components/ProofPage';
 import BenchmarkEvents from './components/BenchmarkEvents';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('command');
+  const [activeTab, setActiveTab] = useState('landing');
   const [health, setHealth] = useState(null);
   const [findings, setFindings] = useState([]);
   const [selectedFinding, setSelectedFinding] = useState(null);
@@ -220,97 +221,120 @@ export default function App() {
     return null;
   };
 
+  if (activeTab === 'landing') {
+    return <LandingPage onLaunchConsole={() => setActiveTab('command')} />;
+  }
+
   return (
-    <div className="min-h-screen bg-[#090b10] text-[#e2e8f0] flex flex-col">
+    <div className="min-h-screen bg-[#04060f] text-[#f3f6ff] flex flex-col font-sans">
       {/* Top Navigation Bar */}
-      <header className="border-b border-[#1f2638] bg-[#0c0e14]/90 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3">
+      <header className="border-b border-[#1f2638] bg-[#0c1226]/90 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold">
+            <button
+              onClick={() => setActiveTab('landing')}
+              className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold hover:bg-emerald-500/20 transition cursor-pointer"
+              title="Return to Landing Page"
+            >
               <Shield className="w-5 h-5" />
-            </div>
+            </button>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-black tracking-wider text-white text-base">PATCHPROOF</span>
+                <button
+                  onClick={() => setActiveTab('landing')}
+                  className="font-black tracking-wider text-white text-base hover:text-emerald-400 transition cursor-pointer"
+                >
+                  WEBFORT
+                </button>
                 <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  PS3 ADAPTIVE WAF
+                  AI ADAPTIVE WAF
                 </span>
               </div>
-              <div className="text-[10px] text-slate-500 font-mono">
+              <div className="text-[10px] text-slate-400 font-mono">
                 Continuous Firewall Verification & Vulnerability Triage
               </div>
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <nav className="flex items-center gap-1 bg-[#11151f] p-1 rounded-lg border border-[#1f2638]">
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setActiveTab('command')}
-              className={`px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition flex items-center gap-1.5 ${
-                activeTab === 'command'
-                  ? 'bg-emerald-500 text-black shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1f2638]/60'
-              }`}
+              onClick={() => setActiveTab('landing')}
+              className="px-3 py-1.5 rounded-md text-xs font-mono font-semibold text-emerald-400 hover:text-white bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition flex items-center gap-1.5 mr-2"
             >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              <span>Command Center</span>
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Landing Page</span>
             </button>
 
-            <button
-              onClick={() => setActiveTab('findings')}
-              className={`px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition flex items-center gap-1.5 ${
-                activeTab === 'findings'
-                  ? 'bg-emerald-500 text-black shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1f2638]/60'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Triage Queue</span>
-              {stats.p0Count > 0 && (
-                <span className={`px-1 py-0.2 text-[9px] rounded-full font-bold ${
-                  activeTab === 'findings' ? 'bg-black text-emerald-400' : 'bg-red-500 text-white'
-                }`}>
-                  {stats.p0Count}
-                </span>
-              )}
-            </button>
+            {/* Navigation Tabs */}
+            <nav className="flex items-center gap-1 bg-[#11151f] p-1 rounded-lg border border-[#1f2638]">
+              <button
+                onClick={() => setActiveTab('command')}
+                className={`px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition flex items-center gap-1.5 ${
+                  activeTab === 'command'
+                    ? 'bg-emerald-500 text-black shadow-sm font-bold'
+                    : 'text-slate-400 hover:text-white hover:bg-[#1f2638]/60'
+                }`}
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>Command Center</span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('studio')}
-              className={`px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition flex items-center gap-1.5 ${
-                activeTab === 'studio'
-                  ? 'bg-emerald-500 text-black shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1f2638]/60'
-              }`}
-            >
-              <Cpu className="w-3.5 h-3.5" />
-              <span>Patch Studio</span>
-            </button>
+              <button
+                onClick={() => setActiveTab('findings')}
+                className={`px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition flex items-center gap-1.5 ${
+                  activeTab === 'findings'
+                    ? 'bg-emerald-500 text-black shadow-sm font-bold'
+                    : 'text-slate-400 hover:text-white hover:bg-[#1f2638]/60'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Triage Queue</span>
+                {stats.p0Count > 0 && (
+                  <span className={`px-1 py-0.2 text-[9px] rounded-full font-bold ${
+                    activeTab === 'findings' ? 'bg-black text-emerald-400' : 'bg-red-500 text-white'
+                  }`}>
+                    {stats.p0Count}
+                  </span>
+                )}
+              </button>
 
-            <button
-              onClick={() => setActiveTab('proof')}
-              className={`px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition flex items-center gap-1.5 ${
-                activeTab === 'proof'
-                  ? 'bg-emerald-500 text-black shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1f2638]/60'
-              }`}
-            >
-              <Award className="w-3.5 h-3.5" />
-              <span>Proof Report</span>
-            </button>
+              <button
+                onClick={() => setActiveTab('studio')}
+                className={`px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition flex items-center gap-1.5 ${
+                  activeTab === 'studio'
+                    ? 'bg-emerald-500 text-black shadow-sm font-bold'
+                    : 'text-slate-400 hover:text-white hover:bg-[#1f2638]/60'
+                }`}
+              >
+                <Cpu className="w-3.5 h-3.5" />
+                <span>Patch Studio</span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('benchmark')}
-              className={`px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition flex items-center gap-1.5 ${
-                activeTab === 'benchmark'
-                  ? 'bg-emerald-500 text-black shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1f2638]/60'
-              }`}
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span>Benchmark & Events</span>
-            </button>
-          </nav>
+              <button
+                onClick={() => setActiveTab('proof')}
+                className={`px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition flex items-center gap-1.5 ${
+                  activeTab === 'proof'
+                    ? 'bg-emerald-500 text-black shadow-sm font-bold'
+                    : 'text-slate-400 hover:text-white hover:bg-[#1f2638]/60'
+                }`}
+              >
+                <Award className="w-3.5 h-3.5" />
+                <span>Proof Report</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('benchmark')}
+                className={`px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition flex items-center gap-1.5 ${
+                  activeTab === 'benchmark'
+                    ? 'bg-emerald-500 text-black shadow-sm font-bold'
+                    : 'text-slate-400 hover:text-white hover:bg-[#1f2638]/60'
+                }`}
+              >
+                <BarChart3 className="w-3.5 h-3.5" />
+                <span>Benchmark & Events</span>
+              </button>
+            </nav>
+          </div>
         </div>
       </header>
 
@@ -366,10 +390,10 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[#1f2638] bg-[#0c0e14] py-3 px-8 text-xs font-mono text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="border-t border-[#1f2638] bg-[#0c1226] py-3 px-8 text-xs font-mono text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-          <span>PatchProof Engine v1.0 · RNSIT CSE Hackathon · 17 Nov 2026</span>
+          <span>WebFort Engine v1.0 · PatchProof Architecture · 17 Nov 2026</span>
         </div>
         <div>
           <span>Local Lab Defense Architecture (Postgres + Juice Shop Target + ed25519)</span>
