@@ -11,7 +11,7 @@
   "scripts": {
     "dev:api": "node apps/api/src/index.js",
     "dev:proxy": "node apps/proxy/src/index.js",
-    "dev": "concurrently \"npm run dev:api\" \"npm run dev:proxy\"",
+    "dev": "node scripts/dev.js",
     "test": "node --test packages/waf-engine/test/engine.test.js apps/proxy/test/proxy.test.js apps/api/test/api.test.js apps/api/test/p3.test.js apps/api/test/vertical-slice.test.js",
     "demo": "node scripts/demo.js"
   },
